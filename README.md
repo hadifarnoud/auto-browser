@@ -38,13 +38,20 @@ them — hidden apps disappear from the menu and are never routed to.
 
 ## Install
 
-Grab the latest zip from [Releases](https://github.com/hadifarnoud/auto-browser/releases),
-unzip into `/Applications`, then clear quarantine (the app is ad-hoc signed,
-not notarized):
+Grab the latest zip from [Releases](https://github.com/hadifarnoud/auto-browser/releases)
+and unzip into `/Applications`.
 
-```sh
-xattr -dr com.apple.quarantine /Applications/AutoBrowser.app
-```
+> [!IMPORTANT]
+> **The app is ad-hoc signed, not notarized** (no paid Apple Developer ID),
+> so Gatekeeper will block the downloaded copy with *"AutoBrowser is damaged
+> or can't be opened"*. This is expected — fix it either way:
+>
+> ```sh
+> xattr -dr com.apple.quarantine /Applications/AutoBrowser.app
+> ```
+>
+> or right-click the app → **Open** → **Open**. Building from source needs
+> neither — locally built apps are never quarantined.
 
 Or build from source (macOS 13+, Xcode command line tools):
 

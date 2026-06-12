@@ -30,4 +30,14 @@ jobs:
             "AutoBrowser-${GITHUB_REF_NAME}.zip" \
             --title "AutoBrowser $GITHUB_REF_NAME" \
             --generate-notes \
-            --notes "The app is ad-hoc signed (not notarized). After unzipping, clear quarantine with: \`xattr -dr com.apple.quarantine AutoBrowser.app\` or right-click → Open."
+            --notes "$(cat <<'NOTES'
+          > [!IMPORTANT]
+          > **This app is ad-hoc signed, not notarized**, so Gatekeeper will block the downloaded copy with *"AutoBrowser is damaged or can't be opened"*. This is expected. After unzipping into /Applications, fix it either way:
+          >
+          > ```sh
+          > xattr -dr com.apple.quarantine /Applications/AutoBrowser.app
+          > ```
+          >
+          > or right-click the app → **Open** → **Open**.
+          NOTES
+          )"
