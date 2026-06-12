@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run tests
+        run: swift test
+
+      - name: Build app bundle
+        run: ./build.sh
+
+      - name: Zip app bundle
+        run: ditto -c -k --keepParent dist/AutoBrowser.app dist/AutoBrowser.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AutoBrowser
+          path: dist/AutoBrowser.zip
+          retention-days: 14

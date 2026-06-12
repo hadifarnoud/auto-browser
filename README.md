@@ -20,6 +20,12 @@ browser (the same architecture used by Velja, Finicky, and Choosy).
   launched.
 - **Manual mode**: pick any browser in the menu; everything opens there until
   you switch back to Automatic.
+- **Rules** (menu → *Rules…*): route specific links to a specific browser,
+  overriding both modes. Each rule can combine three conditions (all must
+  hold): a **URL regex** (e.g. `github\.com`), a **time-of-day window**
+  (may cross midnight), and **only while a given browser is open**. Rules are
+  evaluated top to bottom, first match wins; drag to reorder. Stored as JSON
+  in `~/Library/Application Support/AutoBrowser/rules.json`.
 
 Browsers are discovered dynamically — anything registered as an http(s)
 handler shows up (Safari, Chrome, Firefox, Helium, Arc, Dia, Zen, Brave,
@@ -30,9 +36,17 @@ Some non-browsers (download managers, etc.) also register for http(s) and
 get picked up by discovery. Use **Edit Browser List** in the menu to uncheck
 them — hidden apps disappear from the menu and are never routed to.
 
-## Build & install
+## Install
 
-Requires macOS 13+ and Xcode command line tools.
+Grab the latest zip from [Releases](https://github.com/hadifarnoud/auto-browser/releases),
+unzip into `/Applications`, then clear quarantine (the app is ad-hoc signed,
+not notarized):
+
+```sh
+xattr -dr com.apple.quarantine /Applications/AutoBrowser.app
+```
+
+Or build from source (macOS 13+, Xcode command line tools):
 
 ```sh
 ./build.sh install   # builds, copies to /Applications, launches
@@ -52,9 +66,12 @@ swift build       # debug build of the binary
 
 Layout:
 
-- `Sources/AutoBrowserCore` — pure, testable routing decision logic
-- `Sources/AutoBrowser` — AppKit layer: discovery, tracking, menu, URL handling
+- `Sources/AutoBrowserCore` — pure, testable routing decisions and rule evaluation
+- `Sources/AutoBrowser` — AppKit/SwiftUI layer: discovery, tracking, menu, rules editor, URL handling
 - `docs/superpowers/specs/` — design doc
+
+CI builds and tests every push (`.github/workflows/ci.yml`); pushing a `v*`
+tag builds, zips, and publishes a GitHub release (`.github/workflows/release.yml`).
 
 ## License
 

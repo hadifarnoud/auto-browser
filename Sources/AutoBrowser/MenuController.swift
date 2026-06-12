@@ -10,12 +10,15 @@ final class MenuController: NSObject, NSMenuDelegate {
     private let tracker: BrowserTracker
     private let router: Router
     private let settings: Settings
+    private let rulesStore: RulesStore
+    private let rulesWindow = RulesWindowController()
 
-    init(registry: BrowserRegistry, tracker: BrowserTracker, router: Router, settings: Settings) {
+    init(registry: BrowserRegistry, tracker: BrowserTracker, router: Router, settings: Settings, rulesStore: RulesStore) {
         self.registry = registry
         self.tracker = tracker
         self.router = router
         self.settings = settings
+        self.rulesStore = rulesStore
         self.statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         super.init()
 
@@ -78,6 +81,13 @@ final class MenuController: NSObject, NSMenuDelegate {
         }
 
         menu.addItem(.separator())
+
+        let activeRules = rulesStore.activeRuleCount
+        let rulesTitle = activeRules > 0 ? "Rules… (\(activeRules) active)" : "Rules…"
+        let rules = NSMenuItem(title: rulesTitle, action: #selector(openRulesEditor), keyEquivalent: "r")
+        rules.target = self
+        menu.addItem(rules)
+
         menu.addItem(editBrowserListItem())
         menu.addItem(.separator())
 
@@ -149,6 +159,11 @@ final class MenuController: NSObject, NSMenuDelegate {
         settings.mode = .manual
         settings.manualBrowserID = bundleID
         updateStatusIcon()
+    }
+
+    @objc private func openRulesEditor() {
+        let options = registry.browsers.map { BrowserOption(id: $0.bundleID, name: $0.name) }
+        rulesWindow.show(store: rulesStore, browsers: options)
     }
 
     @objc private func toggleBrowserVisibility(_ sender: NSMenuItem) {

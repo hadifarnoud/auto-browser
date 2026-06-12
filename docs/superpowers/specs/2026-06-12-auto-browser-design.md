@@ -70,6 +70,36 @@ Two possible architectures:
 | `MenuController` | Status item + menu, mode switching, default-browser & login-item actions | all of the above |
 | `AppDelegate` | Receives URLs via `application(_:open:)`, wires everything | all |
 
+## Rules (added 2026-06-12, second iteration)
+
+A rule routes matching links to a specific browser, taking precedence over
+both manual and automatic mode. Conditions (all present ones must hold, AND):
+
+- **URL regex** — matched case-insensitively anywhere in the absolute URL.
+  Invalid patterns skip the rule rather than failing.
+- **Time of day** — minutes-since-midnight window, end exclusive; end before
+  start crosses midnight; equal start/end means all day.
+- **Required open browser** — rule applies only while that browser runs.
+
+Evaluation is first-match-wins over an ordered list (`RuleEvaluator` in
+`AutoBrowserCore`, fully unit-tested). Each URL in a batch is evaluated
+independently and opens are grouped per target. Rule targets resolve against
+*all* discovered handlers (explicit intent overrides the hidden list).
+A rule with no conditions always matches (acts as a pin).
+
+Rules persist as JSON at `~/Library/Application Support/AutoBrowser/rules.json`
+(`RulesStore`, debounced autosave). Edited in a native SwiftUI window
+(`RulesEditor`) opened from the menu: per-rule enable toggle, name, regex
+field, hour/minute pickers, browser popups, drag to reorder, delete.
+
+## CI / Release
+
+`.github/workflows/ci.yml` — push/PR: `swift test` + bundle build + artifact.
+`.github/workflows/release.yml` — `v*` tag: test, build, zip (`ditto`),
+`gh release create` with the job's ephemeral token. Only first-party
+`actions/*` are used (no third-party actions to SHA-pin); permissions are
+`contents: read` for CI and `contents: write` for release only.
+
 ## Resolution rules (pure, unit-tested)
 
 1. Manual mode and the chosen browser is still installed → use it.

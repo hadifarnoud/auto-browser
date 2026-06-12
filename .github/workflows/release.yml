@@ -1,0 +1,33 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run tests
+        run: swift test
+
+      - name: Build app bundle
+        run: ./build.sh
+
+      - name: Zip app bundle
+        run: ditto -c -k --keepParent dist/AutoBrowser.app "AutoBrowser-${GITHUB_REF_NAME}.zip"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            "AutoBrowser-${GITHUB_REF_NAME}.zip" \
+            --title "AutoBrowser $GITHUB_REF_NAME" \
+            --generate-notes \
+            --notes "The app is ad-hoc signed (not notarized). After unzipping, clear quarantine with: \`xattr -dr com.apple.quarantine AutoBrowser.app\` or right-click → Open."
