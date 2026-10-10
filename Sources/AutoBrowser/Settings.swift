@@ -12,6 +12,7 @@ final class Settings {
         static let manualBrowserID = "manualBrowserID"
         static let lastActiveBrowserID = "lastActiveBrowserID"
         static let hiddenBrowserIDs = "hiddenBrowserIDs"
+        static let menuBarHidden = "menuBarHidden"
     }
 
     var mode: RoutingMode {
@@ -22,6 +23,12 @@ final class Settings {
     var manualBrowserID: String? {
         get { defaults.string(forKey: Key.manualBrowserID) }
         set { defaults.set(newValue, forKey: Key.manualBrowserID) }
+    }
+
+    /// Stay hidden across background launches until the app is explicitly opened.
+    var menuBarHidden: Bool {
+        get { defaults.bool(forKey: Key.menuBarHidden) }
+        set { defaults.set(newValue, forKey: Key.menuBarHidden) }
     }
 
     /// Persisted so "no browser running" still routes to the last one used,

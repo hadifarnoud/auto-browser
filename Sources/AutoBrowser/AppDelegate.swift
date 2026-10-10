@@ -1,4 +1,5 @@
 import AppKit
+import Carbon
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var registry: BrowserRegistry!
@@ -27,6 +28,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// during launch and delivers them here after launching finishes.
     func application(_ application: NSApplication, open urls: [URL]) {
         router.open(urls)
+    }
+
+    /// Login launches keep the saved visibility; opening the app explicitly
+    /// restores its controls without changing link routing.
+    func applicationOpenUntitledFile(_ sender: NSApplication) -> Bool {
+        let launchReason = NSAppleEventManager.shared().currentAppleEvent?
+            .paramDescriptor(forKeyword: keyAEPropData)?.enumCodeValue
+        if launchReason != keyAELaunchedAsLogInItem {
+            restoreMenuBarIcon()
+        }
+        return true
+    }
+
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        restoreMenuBarIcon()
+        return false
+    }
+
+    private func restoreMenuBarIcon() {
+        // The initial open event can arrive before the menu is constructed.
+        Settings.shared.menuBarHidden = false
+        menuController?.showMenuBarIcon()
     }
 
     func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool {

@@ -63,6 +63,10 @@ Then click the AutoBrowser icon in the menu bar →
 **Make AutoBrowser the Default Browser…** and confirm the one-time system
 dialog. Optionally enable **Launch at Login**.
 
+Use **Hide from Menu Bar** to remove the icon while AutoBrowser keeps routing
+links in the background. It stays hidden across link-triggered and login
+launches. Open AutoBrowser from Applications or Spotlight to show the icon again.
+
 ## Development
 
 ```sh

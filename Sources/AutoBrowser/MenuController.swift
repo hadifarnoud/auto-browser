@@ -25,8 +25,15 @@ final class MenuController: NSObject, NSMenuDelegate {
         let menu = NSMenu()
         menu.delegate = self
         statusItem.menu = menu
+        statusItem.isVisible = !settings.menuBarHidden
 
         tracker.onChange = { [weak self] in self?.updateStatusIcon() }
+        updateStatusIcon()
+    }
+
+    func showMenuBarIcon() {
+        settings.menuBarHidden = false
+        statusItem.isVisible = true
         updateStatusIcon()
     }
 
@@ -112,6 +119,10 @@ final class MenuController: NSObject, NSMenuDelegate {
 
         menu.addItem(.separator())
         let quit = NSMenuItem(title: "Quit AutoBrowser", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        let hide = NSMenuItem(title: "Hide from Menu Bar", action: #selector(hideMenuBarIcon), keyEquivalent: "")
+        hide.target = self
+        hide.toolTip = "Links keep routing. Open AutoBrowser from Applications or Spotlight to show the icon again."
+        menu.addItem(hide)
         menu.addItem(quit)
     }
 
@@ -148,6 +159,11 @@ final class MenuController: NSObject, NSMenuDelegate {
     }
 
     // MARK: Actions
+
+    @objc private func hideMenuBarIcon() {
+        settings.menuBarHidden = true
+        statusItem.isVisible = false
+    }
 
     @objc private func selectAutomatic() {
         settings.mode = .automatic
